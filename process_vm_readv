@@ -1,11 +1,18 @@
                                                             notes for my own reference
                                                             ---------------------------
                                                             
-static ssize_t process_vm_rw(pid_t pid,const struct iovec __user *lvec,unsigned long liovcnt,const struct iovec __user *rvec,unsigned long riovcnt,unsigned long flags, int vm_write)
+static ssize_t process_vm_rw(pid_t pid,const struct iovec __user *lvec,
+unsigned long liovcnt,const struct iovec __user *rvec,unsigned long riovcnt,
+unsigned long flags, int vm_write)
 
-process_vm_readv() syscall call is associated with this function. here in the arguments the pid of the remote processis provided, the *lvec is the local vector to which data is to be written, liovcnt is the local iov count which describes about the number of segments, the next parameter is the remote vector which contains the remote buffer address, riovcnt is the remote iov count which describes the number of segments in the remote vector, next parameter is the flags which does'nt has no use i guess because it is by default set to zero, next parameter is the write or read bit (0-read , 1-write) 
+process_vm_readv() syscall call is associated with this function. here in the arguments the pid of the remote processis provided, 
+the *lvec is the local vector to which data is to be written, liovcnt is the local iov count which describes about the number of 
+segments, the next parameter is the remote vector which contains the remote buffer address, riovcnt is the remote iov count which 
+describes the number of segments in the remote vector, next parameter is the flags which does'nt has no use i guess because 
+it is by default set to zero, next parameter is the write or read bit (0-read , 1-write) 
 
-so struct iovec contains two data members iov_base and iov_len , the iov_base contains the address of the buffer to be read or written into and iov_len is the length the data.
+so struct iovec contains two data members iov_base and iov_len , the iov_base contains the address of the buffer to be read or 
+written into and iov_len is the length the data.
 
 Now here in the definition of the process_vm_rw , iovstack_l and iovstack_r is declared and a iov_l and iov_r are also declared as a pointer to the stack 
 iov_l points to the iovstack_l and an iterator is declared , the dir variable depicts the read or write functionality 
@@ -15,7 +22,9 @@ import_iovec(int type, const struct iovec __user *uvec,
 		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
 		 struct iov_iter *i, bool compat)
 
-the type argument is about the read or write part , *uvec argument is the userspace vector which is basically the local vector, and the nr_segs is the local iov count, the fast segs is UIO_FASTIOV (a macro defined as 8), the **iovp is the address of iov_l ,*i is the iterator and the compat can be ignored it's basically for the compatibility check
+the type argument is about the read or write part , *uvec argument is the userspace vector which is basically the local vector, 
+and the nr_segs is the local iov count, the fast segs is UIO_FASTIOV (a macro defined as 8), the **iovp is the address of iov_l ,
+*i is the iterator and the compat can be ignored it's basically for the compatibility check
 
 moving foward to the definition part of the function , it has called
 iovec_from_user(const struct iovec __user *uvec,
@@ -25,31 +34,42 @@ iovec_from_user(const struct iovec __user *uvec,
 the arguments are well known so moving to the definition part here *iov is pointing to iovstack_l.
 for example if iovstack_l is at 0x1000 and iov_l is at 0x2000 and iov_l is pointing to 0x1000 and hence *iov is also pointing to iovstack_l
 
-basically in iovec_from_user its doing some checks about the allocation of the stack vector so if the nr_segs is greater than UIO_MAXIOV(a macro defined as 1024) if would return an error and if its greater than UIO_FASTIOV then it would allocate memory using kmalloc_array and if less than UIO_FATIOV then no operation is performed
+basically in iovec_from_user its doing some checks about the allocation of the stack vector 
+so if the nr_segs is greater than UIO_MAXIOV(a macro defined as 1024) if would return an error 
+and if its greater than UIO_FASTIOV then it would allocate memory using kmalloc_array and if less than UIO_FATIOV then no operation is performed
 
-then copy_iovec_from_user is basically a function does some checks on addressing and call copy_from_user which copys the values from the local vector to the iov stack to which *iov is pointing
+then copy_iovec_from_user is basically a function does some checks on addressing and call copy_from_user which copys 
+the values from the local vector to the iov stack to which *iov is pointing
 
 then the iov returned import_iovec, so moving forward
 
-further we seee in import_iovec we can see a loop which there is some address checks in userspace address space using acess_ok, if the addresses are valid then is returns a non-zero value and if invalid it returns 0
+further we seee in import_iovec we can see a loop which there is some address checks in userspace 
+address space using acess_ok, if the addresses are valid then is returns a non-zero value and if invalid it returns 0
 
-later we see MAX_RW_COUNT (a macro defined as INT_MAX & PAGE_MASK), it tells the size can be written or be read at particular instance theoritically means 2^31 - 2^12 bytes and later we can see it calculates the total bytes to be written or to read by adding all the length of each segment 
+later we see MAX_RW_COUNT (a macro defined as INT_MAX & PAGE_MASK), it tells the size can be written or 
+be read at particular instance theoritically means 2^31 - 2^12 bytes and later we can see it calculates 
+the total bytes to be written or to read by adding all the length of each segment 
 
 then we can see 
 iov_iter_init(struct iov_iter *i, unsigned int direction,const struct iovec *iov, unsigned long nr_segs,size_t count)
 
 then it iov_iter_init we can see that first depicts whether operation read or to write then we can see uacess_kernel() is called which is macro defined as 
-get_fs()==KERNEL_DS(). the field addr_limit in the task_struct structure is used to define the highest virtual address that is considered to be valid , the macros get_fs and set_fs are used to do read and write that value and KERNEL_DS() is a macro defined as the maximum virtual address for the kernel (0xffffffff) 
+get_fs()==KERNEL_DS(). the field addr_limit in the task_struct structure is used to define the highest virtual address that is considered to be valid , 
+the macros get_fs and set_fs are used to do read and write that value and KERNEL_DS() is a macro defined as the maximum virtual address for the kernel (0xffffffff)
 
 the fs value determines whether argument validity checking should be performed or not if get_fs == USER_DS, checking is performed, with get_fs==KERNEL_DS checking is bypassed. this means this is used to check if it is using the kernel address space or not
 
-later we can see it initializing the data member type of the iov_iter which means whether it is performing a read or write operation, its a bitmask contating whether data is read or written to or from the iterator and the data member iov is used to intialize the iov given in the parameter of the function and similarly the other data members are intialized too. at the end it doesnt return anything
+later we can see it initializing the data member type of the iov_iter which means whether it is performing a read or write 
+operation, its a bitmask contating whether data is read or written to or from the iterator and the data 
+member iov is used to intialize the iov given in the parameter of the function and similarly the other data members are 
+intialized too. at the end it doesnt return anything
 
 returning to import_iovec it returns the total length 
 
 returning to process_vm_rw , if does some checks if everything is initalized properly
 
-we can see that iovec_from_user is called again for the remote vector, than means it does the same checks on UIO_FASTIOV and UIO_MAXIOV and it copies data from remote vector to the *iov
+we can see that iovec_from_user is called again for the remote vector, than means it does the same checks on UIO_FASTIOV and UIO_MAXIOV and 
+it copies data from remote vector to the *iov
 
 then we can see 
 process_vm_rw_core(pid_t pid, struct iov_iter *iter,
