@@ -53,11 +53,15 @@ the total bytes to be written or to read by adding all the length of each segmen
 then we can see 
 iov_iter_init(struct iov_iter *i, unsigned int direction,const struct iovec *iov, unsigned long nr_segs,size_t count)
 
-then it iov_iter_init we can see that first depicts whether operation read or to write then we can see uacess_kernel() is called which is macro defined as 
-get_fs()==KERNEL_DS(). the field addr_limit in the task_struct structure is used to define the highest virtual address that is considered to be valid , 
-the macros get_fs and set_fs are used to do read and write that value and KERNEL_DS() is a macro defined as the maximum virtual address for the kernel (0xffffffff)
+then it iov_iter_init we can see that first depicts whether operation read or to write then we can see uacess_kernel() is called 
+which is macro defined as get_fs()==KERNEL_DS(). the field addr_limit in the task_struct structure 
+is used to define the highest virtual address that is considered to be valid , 
 
-the fs value determines whether argument validity checking should be performed or not if get_fs == USER_DS, checking is performed, with get_fs==KERNEL_DS checking is bypassed. this means this is used to check if it is using the kernel address space or not
+the macros get_fs and set_fs are used to do read and write that value and KERNEL_DS() is a 
+macro defined as the maximum virtual address for the kernel (0xffffffff)
+
+the fs value determines whether argument validity checking should be performed or not if get_fs == USER_DS, checking is performed, 
+with get_fs==KERNEL_DS checking is bypassed. this means this is used to check if it is using the kernel address space or not
 
 later we can see it initializing the data member type of the iov_iter which means whether it is performing a read or write 
 operation, its a bitmask contating whether data is read or written to or from the iterator and the data 
