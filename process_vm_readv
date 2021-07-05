@@ -98,12 +98,19 @@ here we are finding the maximum number of pages which is required for the iter
 
 find_get_task_by_vpid is used to find the information on a process
 
-mm_access checks for permissions for the requested address by the process,it verifies the permissions the current task has regarding the task to which the memory belongs,if the current and target task do not share the same memory manager, the kernel invokes __ptrace_may_access
+mm_access checks for permissions for the requested address by the process,it verifies the permissions the current task has regarding the task to 
+which the memory belongs,if the current and target task do not share the same memory manager, the kernel invokes __ptrace_may_access
 
-a process which would like to read from an unrelated /proc/[pid]/mem file should have access mode PTRACE_MODE_ATTACH_FSCREDS. This check does not verify that a process is attached via PTRACE_ATTACH, but rather if it has the permission to attach with the specified credentials mode.
+a process which would like to read from an unrelated /proc/[pid]/mem file should have access mode PTRACE_MODE_ATTACH_FSCREDS. 
+This check does not verify that a process is attached via PTRACE_ATTACH, but rather if it has the permission to attach with the specified credentials mode.
 
-then we are running a loop till riovcnt and calling process_vm_rw_single_vec and passing the base and length for each segment and then call process_vm_rw_single_vec in which we are calculating the page address and the offset in the page and calculation nr_pages which is the page range required
-now we are pinning the pages, now pinning means that page is locked in the main memory and doesnt get swapped out with the secondary device and a page can be pinned for short period or a long period or permanent, the code for paging in permanently pinned in the main memory so that different functionality of the virtual memory can take place
+then we are running a loop till riovcnt and calling process_vm_rw_single_vec and passing the base and length for each segment and 
+then call process_vm_rw_single_vec in which we are calculating the page address and the offset in the page and calculation nr_pages 
+which is the page range required
+
+now we are pinning the pages, now pinning means that page is locked in the main memory and doesnt get swapped out with 
+the secondary device and a page can be pinned for short period or a long period or permanent, 
+the code for paging in permanently pinned in the main memory so that different functionality of the virtual memory can take place
 
 then we call process_vm_rw_pages where each page is copied to the iter and the values are updated (page address, nr_pages )
 
