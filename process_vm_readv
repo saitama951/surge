@@ -133,7 +133,8 @@ https://www.programmersought.com/article/9841490505/-> kernel_ds, user_ds
 https://www.spinics.net/lists/newbies/msg00861.html -> kernel_ds
 http://www2.cs.uregina.ca/~hamilton/courses/330/notes/memory/paging.html -> paging
 https://blog.cloudflare.com/diving-into-proc-pid-mem/#:~:text=The%20special%20thing%20about%20mm_access,a%20method%20named%20__ptrace_may_access%20.
--> mm_accesshttps://2wisebit.wordpress.com/2018/06/05/memory-pinning/-> memory pinning
+-> mm_access
+https://2wisebit.wordpress.com/2018/06/05/memory-pinning/-> memory pinning
 
 
 
