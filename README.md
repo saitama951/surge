@@ -1,6 +1,7 @@
 # surge
 **Testing**
-the logs are present in the logs folder inside tests which contains the testing for different parameters in the given local and 
+
+The logs are present in the logs folder inside tests which contains the testing for different parameters in the given local and 
 remote test code which is divided by modules. 
 
 each log file is named after { log(local test code module number)(remote test code module number) }
