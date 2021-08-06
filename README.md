@@ -1,4 +1,10 @@
 # surge
+**Testing**
+```the logs are present in the logs folder inside tests which contains the testing for different parameters in the given local and remote test code which is 
+divided by modules. each log file is named after { log(local test code module number)(remote test code module number) } example:- log21 means the second module of
+the local process is executed and the first module of the remote process is executed```
+
+
 
 my kernel version
 --------------------
@@ -12,3 +18,4 @@ steps to run
 4. ```sudo ./a.out```
 5. ```sudo dmesg```
 6. ```sudo rmmod```
+
