@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "errno.h"
 #include "sys/ptrace.h"
-#define module 6
+#define module 4
 void main(int argc,char* argv[])
 {
 	int errcode=0;
@@ -18,7 +18,7 @@ void main(int argc,char* argv[])
 		char *buf=(char*)malloc(size);
 
 		local[0].iov_base = buf;
-		local[0].iov_len = 512;
+		local[0].iov_len = size;
 
 		remote[0].iov_base = (void *)strtoul(argv[1],NULL,16);
 		remote[0].iov_len = size;
@@ -38,8 +38,9 @@ void main(int argc,char* argv[])
 		pid_t pid=atoi(argv[2]);
 		ssize_t size=atoi(argv[3]);
 		int i=0;
-		char **buf;
-		buf=(char **)malloc(10);
+//		char **buf;
+		//buf=(char **)malloc(10); corrupted malloc() for 1024*1024*1024
+		char*buf[10];
 		for(i=0;i<10;i++)
 		{
 			buf[i]=(char*)malloc(size/10);
@@ -71,10 +72,10 @@ void main(int argc,char* argv[])
 		pid_t pid=atoi(argv[2]);
 		ssize_t size=atoi(argv[3]);
 		int i=0;
-		char **buf;
+		//char **buf;
 		
-		buf=(char **)malloc(20);
-		
+		//buf=(char **)malloc(20);
+		char *buf[20];
 		for(i=0;i<20;i++)
 		{
 			buf[i]=(char*)malloc(size/20);
@@ -107,10 +108,10 @@ void main(int argc,char* argv[])
 		pid_t pid=atoi(argv[2]);
 		ssize_t size=atoi(argv[3]);
 		int i=0;
-		char **buf;
+		//char **buf;
 		
-		buf=(char **)malloc(50);
-		
+		//buf=(char **)malloc(50);
+		char *buf[50];
 		for(i=0;i<50;i++)
 		{
 			buf[i]=(char*)malloc(size/50);

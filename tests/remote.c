@@ -3,7 +3,7 @@
 #include "string.h"
 #include "unistd.h"
 #include "malloc.h"
-#define module 6
+#define module 4
 
 void generate_random_text(char *text,int msize)
 {
@@ -36,12 +36,12 @@ int main()
 		char *text=(char *)malloc(1024*1024);
 		generate_random_text(text,1024*1024);
 		printf("%llx %d %d",text,getpid(),1024*1024);
-		free(text);
+		//free(text);
 	#elif module==4
-		char *text=(char *)malloc(1204*1024*1024);
+		char *text=(char *)malloc(1024*1024*1024);
 		generate_random_text(text,1024*1024*1024);
 		printf("%llx %d %d",text,getpid(),1024*1024*1024);
-		free(text);
+		//free(text);
 	#elif module==5
 		char **text;
 		int i;
